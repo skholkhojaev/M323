@@ -1,8 +1,28 @@
+"""
+Dieses Programm analysiert Verkehrsunfalldaten aus einer JSON-Datei und bietet mehrere Optionen zur Anzeige und Auswertung:
+1. Liste der neuesten Unfälle (letzte 2 Monate) pro Gemeinde
+2. Unfälle einer bestimmten Gemeinde in den letzten 2 Jahren
+3. Anzahl der Unfälle nach Fahrzeugtyp
+4. Rangliste der Unfallanzahl pro Gemeinde
+5. Anzahl der Unfälle nach Treibstoffart
+
+Autor: Sino, Janie
+Version: 1.0
+"""
+
 import json
 from datetime import datetime
 
 def get_latest_date(data):
-    """Finds the most recent date in the dataset."""
+    """
+    Ermittelt das neueste Jahr-Monat-Datum in den Daten.
+
+    Parameter:
+    data (list): Liste der Unfallaufzeichnungen
+
+    Rückgabewert:
+    str: Das neueste Jahr-Monat-Datum im Format 'YYYY-MM'
+    """
     latest_year_month = "0000-00"
     for record in data:
         if record['jahr_monat'] > latest_year_month:
@@ -10,7 +30,16 @@ def get_latest_date(data):
     return latest_year_month
 
 def get_last_n_months_from_latest(latest_year_month, n):
-    """Returns a list of (year, month) strings for the last n months based on the most recent accident date."""
+    """
+    Erstellt eine Liste der letzten 'n' Monate ab einem gegebenen Jahr-Monat-Wert.
+
+    Parameter:
+    latest_year_month (str): Das neueste Datum im Format 'YYYY-MM'
+    n (int): Anzahl der Monate
+
+    Rückgabewert:
+    list: Liste der letzten 'n' Monate im Format 'YYYY-MM'
+    """
     latest_year, latest_month = map(int, latest_year_month.split('-'))
     months = []
     year, month = latest_year, latest_month
@@ -24,6 +53,12 @@ def get_last_n_months_from_latest(latest_year_month, n):
     return months
 
 def list_latest_accidents_per_municipality(data):
+    """
+    Listet die neuesten Unfallaufzeichnungen der letzten 2 Monate nach Gemeinde auf.
+
+    Parameter:
+    data (list): Liste der Unfallaufzeichnungen
+    """
     latest_year_month = get_latest_date(data)
     last_months = get_last_n_months_from_latest(latest_year_month, 2)
     accidents_per_municipality = {}
@@ -41,6 +76,14 @@ def list_latest_accidents_per_municipality(data):
             print_record_info(record)
 
 def accidents_in_municipality_last_n_years(data, selected_municipality, n_years):
+    """
+    Listet Unfälle einer bestimmten Gemeinde in den letzten 'n' Jahren auf.
+
+    Parameter:
+    data (list): Liste der Unfallaufzeichnungen
+    selected_municipality (str): Name der ausgewählten Gemeinde
+    n_years (int): Anzahl der Jahre für die Rückwärtssuche
+    """
     latest_year_month = get_latest_date(data)
     latest_year, _ = map(int, latest_year_month.split('-'))
     years = [str(latest_year - i) for i in range(n_years)]
@@ -59,6 +102,12 @@ def accidents_in_municipality_last_n_years(data, selected_municipality, n_years)
         print(f"Keine Unfälle in der Gemeinde {selected_municipality} in den letzten {n_years} Jahren gefunden.")
 
 def number_of_accidents_per_vehicle_type(data):
+    """
+    Gibt die Anzahl der Unfälle pro Fahrzeugtyp aus.
+
+    Parameter:
+    data (list): Liste der Unfallaufzeichnungen
+    """
     vehicle_types = {}
     for record in data:
         vehicle_type = record['fahrzeugart']
@@ -68,6 +117,12 @@ def number_of_accidents_per_vehicle_type(data):
         print(f"{vehicle_type}: {count} Fahrzeuge")
 
 def ranking_of_accidents_per_municipality(data):
+    """
+    Erstellt eine Rangliste der Anzahl der Unfälle pro Gemeinde.
+
+    Parameter:
+    data (list): Liste der Unfallaufzeichnungen
+    """
     municipality_counts = {}
     for record in data:
         municipality = record['gemeinde']
@@ -79,6 +134,12 @@ def ranking_of_accidents_per_municipality(data):
         print(f"{rank}. Gemeinde {municipality}: {count} Fahrzeuge")
 
 def number_of_accidents_per_fuel_type(data):
+    """
+    Gibt die Anzahl der Unfälle pro Treibstoffart aus.
+
+    Parameter:
+    data (list): Liste der Unfallaufzeichnungen
+    """
     fuel_types = {}
     for record in data:
         fuel_type = record['treibstoff'] or "Unbekannt"
@@ -88,6 +149,12 @@ def number_of_accidents_per_fuel_type(data):
         print(f"{fuel_type}: {count} Fahrzeuge")
 
 def print_record_info(record):
+    """
+    Gibt detaillierte Informationen einer Unfallaufzeichnung aus.
+
+    Parameter:
+    record (dict): Eine Unfallaufzeichnung
+    """
     print(f" Jahr-Monat: {record['jahr_monat']}")
     print(f" Gemeinde: {record['gemeinde']}")
     print(f" Fahrzeugart: {record['fahrzeugart']}")
@@ -96,6 +163,9 @@ def print_record_info(record):
     print()
 
 def main():
+    """
+    Hauptprogramm, lädt die Daten und bietet dem Benutzer verschiedene Optionen zur Auswahl.
+    """
     try:
         with open('roadtrafficaccidentlocations.json', 'r', encoding='utf-8') as f:
             data = json.load(f)
